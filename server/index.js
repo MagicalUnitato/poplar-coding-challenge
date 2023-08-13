@@ -25,7 +25,7 @@ server.start().then(res => {
 });
 faker.seed(42)
 db.sequelize.sync({force : true}).then(() => {
-  // populate author table with dummy data
+  // populate user table with dummy data
   db.user.bulkCreate(
     times(10, () => ({
       //id : faker.string.alphanumeric({ length: { min: 5, max: 10 } }),
@@ -33,7 +33,7 @@ db.sequelize.sync({force : true}).then(() => {
       lastName: faker.person.lastName()
     }))
   );
-  // populate post table with dummy data
+  // populate property table with dummy data
   db.property.bulkCreate(
     times(10, () => ({
       street: faker.location.street(),
