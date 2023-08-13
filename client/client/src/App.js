@@ -1,32 +1,63 @@
 import logo from './logo.svg';
 import './App.css';
 import { useQuery, gql } from '@apollo/client';
-
-const GET_PROPERTIES = gql`
-query Query {
-  users {
-    id
-    firstName
-    lastName
-    property {
-      id
-      street
-      city
-      state
-      zip
-      rent
+import { useState } from "react";
+import Button from '@mui/material/Button';
+import Input from '@mui/material/Input';
+import Typography from '@mui/material/Typography';
+import ListItemText from '@mui/material/ListItemText';
+import List from '@mui/material/List';
+import ListSubheader from '@mui/material/ListSubheader';
+const GET_PROPERTIES_SEARCH = gql`
+  query Query($input: SearchFilter) {
+    search(input: $input) {
+      firstName
+      lastName
+      property {
+        street
+        city
+        state
+        rent
+        zip
+      }
     }
   }
-}
 `;
-function DisplayProperties() {
-  const { data , loading , error} = useQuery(GET_PROPERTIES);
+
+function useSearchFilters() {
+  const [filters, _updateFilter] = useState({ 
+    id: undefined, 
+    name: undefined 
+  });
+
+  const updateFilter = (filterType, value) => {
+    _updateFilter({
+      [filterType]: value,
+    });
+  };
+
+  return {
+    models: { filters },
+    operations: { updateFilter },
+  };
+}
+
+function App() {
+  const { operations, models } = useSearchFilters();
+  const { data, loading, error, refetch } = useQuery(GET_PROPERTIES_SEARCH);
   if (loading) return "Loading...";
-  if (error) return <pre>{error.message}</pre>
-  data.users.map((users) => {console.log(users)})
+  if (error) return <div>error</div>;
   return (
-    <div>
-        {data.users.map((users) => {
+    <div class="main">
+      <div class="sub">
+        <Typography variant="h2" component="h2">Poplar Code Challenge</Typography>
+        <div>
+          <label>Search</label>
+          <Input onChange={(e) => operations.updateFilter("name", e.target.value)} type="string"/>
+        </div>
+        <br/>
+        <Button onClick={() =>refetch({input: { firstName: models.filters.name },})}>Submit</Button>
+        {/*data.search.map((users) => {
           return <ul key={users.id}>
               <li>{users.lastName},{users.firstName}</li>
               {users.property.map((property) => {
@@ -39,29 +70,18 @@ function DisplayProperties() {
                 </ul>
               })}
           </ul>
-        })}
-    </div>
-  )
-}
-function App() {
-  return (
-    <div class="main">
-      <div class="sub">
-        <h2>My first Apollo app 🚀</h2>
-        <div>
-          <label>Search</label>
-          <input
-            onChange={(e) => { /* Handle updating search/filter text */ }}
-            type="string"
-          />
-        </div>
-        <br/>
-          <button
-          onClick={() => { /* Handle search/filter */ }}
-          >
-            Submit
-          </button>
-        <DisplayProperties />
+        })*/}
+        <List
+          sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+          component="nav"
+          aria-labelledby="nested-list-subheader"
+          subheader={
+            <ListSubheader component="div" id="nested-list-subheader">
+              Nested List Items
+            </ListSubheader>
+          }
+        >
+        </List>
       </div>
     </div>
   );

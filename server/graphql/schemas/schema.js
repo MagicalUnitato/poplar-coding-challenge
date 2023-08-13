@@ -25,6 +25,6 @@ export default `
     property(id: ID!): Property
     user(id: ID!): User
     users: [User!]
-    search(input: SearchFilter!): User
+    search(input: SearchFilter): [User]
   }
 `;

@@ -18,16 +18,14 @@ export default {
       search: (parent, args, { db }, info) => {
 
         const shouldApplyFilter = args.input && args.input.firstName;
-        console.log("INPUT"+"."+args.input)
-        console.log("EINPUT"+"."+args.input.firstName)
         if (shouldApplyFilter) {
           const nameFilter = args.input.firstName;
-          console.log("NINPUT"+"."+nameFilter)
           return db.user.findAll({ 
             where: {
               firstName : nameFilter}
             })
         }
+        return db.user.findAll()
       },
     },
   };
