@@ -21,10 +21,6 @@ export default `
     user: User!
   }
   type Query {
-    properties: [Property!]
-    property(id: ID!): Property
-    user(id: ID!): User
-    users: [User!]
     search(input: SearchFilter): [User]
   }
 `;

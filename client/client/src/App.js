@@ -3,11 +3,17 @@ import './App.css';
 import { useQuery, gql } from '@apollo/client';
 import { useState } from "react";
 import Button from '@mui/material/Button';
-import Input from '@mui/material/Input';
 import Typography from '@mui/material/Typography';
-import ListItemText from '@mui/material/ListItemText';
+
 import List from '@mui/material/List';
-import ListSubheader from '@mui/material/ListSubheader';
+import ListItem from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Divider from '@mui/material/Divider';
+
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
+
 const GET_PROPERTIES_SEARCH = gql`
   query Query($input: SearchFilter) {
     search(input: $input) {
@@ -45,6 +51,10 @@ function useSearchFilters() {
 function App() {
   const { operations, models } = useSearchFilters();
   const { data, loading, error, refetch } = useQuery(GET_PROPERTIES_SEARCH);
+  const [open, setOpen] = useState(true);
+  const handleClick = () => {
+    setOpen(!open);
+  };
   if (loading) return "Loading...";
   if (error) return <div>error</div>;
   return (
@@ -52,36 +62,66 @@ function App() {
       <div class="sub">
         <Typography variant="h2" component="h2">Poplar Code Challenge</Typography>
         <div>
-          <label>Search</label>
-          <Input onChange={(e) => operations.updateFilter("name", e.target.value)} type="string"/>
+          <Autocomplete /* autocomplete search */
+            id="free-solo-demo"
+            freeSolo
+            options={data.search.map((users) => users.firstName)}
+            onInputChange={(e,value) => operations.updateFilter("name", value)}
+            renderInput={(params) => <TextField {...params} label="Search" />}
+          />
         </div>
         <br/>
         <Button onClick={() =>refetch({input: { firstName: models.filters.name },})}>Submit</Button>
-        {/*data.search.map((users) => {
-          return <ul key={users.id}>
-              <li>{users.lastName},{users.firstName}</li>
-              {users.property.map((property) => {
-                return <ul key={property.id}>
-                    <li>{property.street}</li>
-                    <li>{property.city}</li>
-                    <li>{property.state}</li>
-                    <li>{property.zip}</li>
-                    <li>{property.rent}</li>
-                </ul>
-              })}
-          </ul>
-        })*/}
-        <List
-          sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
-          component="nav"
-          aria-labelledby="nested-list-subheader"
-          subheader={
-            <ListSubheader component="div" id="nested-list-subheader">
-              Nested List Items
-            </ListSubheader>
-          }
-        >
-        </List>
+      <List
+      sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+      component="nav"
+      aria-labelledby="nested-list-subheader"
+      >
+        {data.search.map((users) => { /* map data given from query */
+          return ( 
+            <div>
+            <ListItem key={users.id} onClick={handleClick}>
+                <ListItemText primary={users.firstName} secondary={users.lastName}/>
+            </ListItem>
+                <List component='li' disablePadding key={users.firstName}>
+                    {users.property.map(property => { /* map property array from users */
+                        return (
+                          <div>
+                            <ListItem key={property.id}>
+                                <ListItemIcon>
+                                </ListItemIcon>
+                                <ListItemText key={property.id} primary={property.street} secondary="Street"/>
+                            </ListItem>
+                            <ListItem key={property.id}>
+                                <ListItemIcon>
+                                </ListItemIcon>
+                                <ListItemText key={property.id} primary={property.city} secondary="City"/>
+                            </ListItem>
+                            <ListItem key={property.id}>
+                                <ListItemIcon>
+                                </ListItemIcon>
+                                <ListItemText key={property.id} primary={property.state} secondary="State"/>
+                            </ListItem>
+                            <ListItem key={property.id}>
+                                <ListItemIcon>
+                                </ListItemIcon>
+                                <ListItemText key={property.id} primary={property.zip} secondary="Zip"/>
+                            </ListItem>
+                            <ListItem key={property.id}>
+                                <ListItemIcon>
+                                </ListItemIcon>
+                                <ListItemText key={property.id} primary={property.rent} secondary="Rent"/>
+                            </ListItem>
+                            <Divider />
+                          </div>
+                        )
+                    })}
+                </List>
+            <Divider />
+        </div>
+          )
+        })}
+      </List>
       </div>
     </div>
   );
